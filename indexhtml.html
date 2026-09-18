@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Pro Trading Dashboard</title>
+
+<style>
+body{
+  margin:0;
+  background:#0b0f1a;
+  color:white;
+  font-family:Arial;
+}
+
+.header{
+  padding:10px;
+  background:#11182a;
+  display:flex;
+  justify-content:space-between;
+}
+
+.box{
+  padding:10px;
+  margin:10px;
+  background:#11182a;
+  border-radius:10px;
+}
+
+button{
+  padding:10px;
+  margin:5px;
+  border:none;
+  border-radius:5px;
+  cursor:pointer;
+}
+
+.buy{background:green;color:white;}
+.sell{background:red;color:white;}
+</style>
+</head>
+
+<body>
+
+<div class="header">
+  <h3>Live Trading Dashboard</h3>
+  <div>BTC/USDT</div>
+</div>
+
+<div class="box">
+  💰 Price: <span id="price">Loading...</span>
+</div>
+
+<div class="box">
+  📊 Signal: <span id="signal">Waiting...</span>
+</div>
+
+<div class="box">
+  <button class="buy" onclick="trade('BUY')">BUY</button>
+  <button class="sell" onclick="trade('SELL')">SELL</button>
+  <div id="result"></div>
+</div>
+
+<!-- Chart -->
+<div class="box">
+<div class="tradingview-widget-container">
+  <div id="chart"></div>
+
+  <script src="https://s3.tradingview.com/tv.js"></script>
+  <script>
+    new TradingView.widget({
+      "container_id": "chart",
+      "width": "100%",
+      "height": 500,
+      "symbol": "BINANCE:BTCUSDT",
+      "interval": "5",
+      "theme": "dark"
+    });
+  </script>
+</div>
+</div>
+
+<script>
+// گرفتن قیمت زنده از API
+async function getPrice(){
+  let res = await fetch("https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT");
+  let data = await res.json();
+  document.getElementById("price").innerText = data.price;
+
+  // سیگنال ساده (نمونه)
+  let price = parseFloat(data.price);
+  if(price % 2 === 0){
+    document.getElementById("signal").innerText = "BUY 🔼";
+  }else{
+    document.getElementById("signal").innerText = "SELL 🔻";
+  }
+}
+
+function trade(type){
+  document.getElementById("result").innerText =
+    "Order placed: " + type;
+}
+
+setInterval(getPrice, 3000);
+getPrice();
+</script>
+
+</body>
+</html>
